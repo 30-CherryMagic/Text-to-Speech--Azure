@@ -30,6 +30,7 @@ header.jumbotron {
   background-position: center center;
   padding: 35px;
   margin-top: 20px;
+  border-radius: 0;
   color: #fff;
   text-align: center;
   border: 3px solid #614ad3;
@@ -71,6 +72,14 @@ h2 {
   width: 300px;
 }
 
+.region {
+  padding: 5px;
+  margin-left: 5px;
+  display: inline;
+  width: 130px;
+  color: #999;
+}
+
 select {
   width: 300px;
   padding: 7px;
@@ -103,9 +112,11 @@ button {
   border-radius: 7px;
   border: none;
 }
+
 i {
   color: #614ad3;
 }
+
 .fa-python {
   color: #FFF;
 }
@@ -115,37 +126,38 @@ i {
 
 <body>
     
-    <div class="container"> 
-        <header class="jumbotron">
-            <h1>文字轉語音( <i class="fab fa-python"></i> Script製作 )</h1>
-       </header>
-       <form name="easyForm">
-           <h2>1. 請輸入金鑰 <i class="fas fa-key"></i><span>請謹慎保管，勿外流</span></h2>
-           <input class="keyBox" id="keyBox" type="text" required>
-       
-           <h2>2. 選擇語系 <i class="fas fa-language"></i><span>目前僅建置4種選項</span></h2>
-           <!--給定這id，等等需要用他填入學院資料,onchange內動到這element會呼叫裡面的方法
-           this.selectedIndex是選到第幾項的值(0開始)傳入當參數-->
-           <select id="language-list" ></select>
-     
-           <h2>3. 選擇角色 <i class="fas fa-user-friends"></i><span>可選的角色受語系影響</span></h2>
-           <select id="role-list"></select><!--給定這id，等等需要用他填入對應的角色資料-->
-     
-           <h2>4. 選擇文本類型 <i class="fas fa-code"></i><span>有調整語速請選SSML</span></h2>
-           <select id="textYype">
-             <option value="synthesizer.speak_text_async(scenario)">純文字</option>
-             <option value="synthesizer.speak_ssml_async(scenario)">SSML</option>
-           </select>
-     
-           <h2>5. 輸入文本 <i class="fas fa-file-alt"></i><span>含標點符號，刪除空白與換行，換行處與「"」前需加上「\」</span></h2>
-           <textarea id="text4speech" rows="5" cols="50"></textarea>
-     
-           <h2>6. 檔案名稱 <i class="fas fa-download"></i><span>命名格式：第一週_01_內容</span></h2>
-           <input class="fileName" id="fileName" type="text"  required>
-     
-           <button id="downloadButton">Download</button>
-       </form>
-     </div>
+  <div class="container"> 
+    <header class="jumbotron">
+     <h1>文字轉語音( <i class="fab fa-python"></i> Script製作 )</h1>
+   </header>
+   <form name="easyForm">
+       <h2>1. 請輸入金鑰 <i class="fas fa-key"></i><span>請謹慎保管，勿外流</span></h2>
+       <input class="keyBox" id="keyBox" type="text" required>
+       <input class="region" id="region" type="text" value="southcentralus" required>
+   
+       <h2>2. 選擇語系 <i class="fas fa-language"></i><span>目前僅建置4種選項</span></h2>
+       <!--給定這id，等等需要用他填入學院資料,onchange內動到這element會呼叫裡面的方法
+       this.selectedIndex是選到第幾項的值(0開始)傳入當參數-->
+       <select id="language-list" ></select>
+ 
+       <h2>3. 選擇角色 <i class="fas fa-user-friends"></i><span>可選的角色受語系影響</span></h2>
+       <select id="role-list"></select><!--給定這id，等等需要用他填入對應的角色資料-->
+ 
+       <h2>4. 選擇文本類型 <i class="fas fa-code"></i><span>有調整語速請選SSML</span></h2>
+       <select id="textYype">
+         <option value="synthesizer.speak_text_async(scenario)">純文字</option>
+         <option value="synthesizer.speak_ssml_async(scenario)">SSML</option>
+       </select>
+ 
+       <h2>5. 輸入文本 <i class="fas fa-file-alt"></i><span>含標點符號，刪除空白與換行，換行處與「"」前需加上「\」</span></h2>
+       <textarea id="text4speech" rows="5" cols="50" required></textarea>
+ 
+       <h2>6. 檔案名稱 <i class="fas fa-download"></i><span>命名格式:第一週_01_內容</span></h2>
+       <input class="fileName" id="fileName" type="text"  required>
+ 
+       <button id="downloadButton">Download</button>
+   </form>
+ </div>
 
 </body>
 
@@ -197,13 +209,14 @@ i {
 
 //------------------------------------------------------------------------------------------
 
-var theKey=document.getElementById("keyBox").text;
-var theLanguage=document.getElementById("language-list").value;
-var theRole=document.getElementById("role-list").value;
-var theTextType=document.getElementById("textYype").value;
-var theText=document.getElementById("text4speech").value;
+var theKey = document.getElementById("keyBox").value;
+var theRegion = document.getElementById("region").value;
+var theLanguage = document.getElementById("language-list").value;
+var theRole = document.getElementById("role-list").value;
+var theTextType = document.getElementById("textYype").value;
+var theText = document.getElementById("text4speech").value;
 
-var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="southcentralus")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname = datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
+var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="'+theRegion+'")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname = datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
 
 //----------------------------------------------------------------------------------------------
 // 只支援IE
