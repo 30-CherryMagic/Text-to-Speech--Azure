@@ -1,0 +1,250 @@
+<!--功能:4hrs/外觀:1hr-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <title>Text to Speech</title>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+</head>
+<style>
+
+body {
+  padding: 0px;
+  margin: 0px;
+  background-color: #f0edff;
+}
+
+form {
+  padding-left: 50px;
+  border: 3px solid #614ad3;
+  margin-bottom: 10px;
+  background-color: #fff;
+}
+
+header.jumbotron {
+  background-color: #614ad3;
+  background-size: cover;
+  background-position: center center;
+  padding: 35px;
+  margin-top: 20px;
+  color: #fff;
+  text-align: center;
+  border: 3px solid #614ad3;
+}
+
+span {
+  font-size: 12px;
+  color: #888;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+span.maker {
+  color: #2d248a;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 36px;
+}
+
+.container {
+  width: 600px;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 30px;
+  margin-top: 35px;
+  color: #2d248a;
+}
+
+.keyBox, .fileName {
+  color: #999;
+  padding: 5px;
+  padding-left: 10px;
+  width: 300px;
+}
+
+select {
+  width: 300px;
+  padding: 7px;
+  border-radius: 7px;
+}
+
+textarea {
+  color: #999;
+  padding: 10px;
+  padding-left: 15px;
+  padding-right: 15px;
+  display: block;
+  border-radius: 7px;
+}
+
+input {
+  border-radius: 7px;
+  border: 1px solid #000;
+  padding: 7px;
+}
+
+button {
+  display: inline;
+  margin-left: 20px;
+  padding: 7px 20px 7px 20px;
+  margin-bottom: 50px;
+  font-weight: bold;
+  background-color: #e42c64;
+  color: #FFF;
+  border-radius: 7px;
+  border: none;
+}
+i {
+  color: #614ad3;
+}
+.fa-python {
+  color: #FFF;
+}
+</style>
+
+
+
+<body>
+    
+    <div class="container"> 
+        <header class="jumbotron">
+            <h1>文字轉語音( <i class="fab fa-python"></i> Script製作 )</h1>
+       </header>
+       <form name="easyForm">
+           <h2>1. 請輸入金鑰 <i class="fas fa-key"></i><span>請謹慎保管，勿外流</span></h2>
+           <input class="keyBox" id="keyBox" type="text" required>
+       
+           <h2>2. 選擇語系 <i class="fas fa-language"></i><span>目前僅建置4種選項</span></h2>
+           <!--給定這id，等等需要用他填入學院資料,onchange內動到這element會呼叫裡面的方法
+           this.selectedIndex是選到第幾項的值(0開始)傳入當參數-->
+           <select id="language-list" ></select>
+     
+           <h2>3. 選擇角色 <i class="fas fa-user-friends"></i><span>可選的角色受語系影響</span></h2>
+           <select id="role-list"></select><!--給定這id，等等需要用他填入對應的角色資料-->
+     
+           <h2>4. 選擇文本類型 <i class="fas fa-code"></i><span>如需調整語速請選SSML</span></h2>
+           <select id="textYype">
+             <option value="synthesizer.speak_text_async(scenario)">純文字</option>
+             <option value="synthesizer.speak_ssml_async(scenario)">SSML</option>
+           </select>
+     
+           <h2>5. 輸入文本 <i class="fas fa-file-alt"></i><span>需連同標點符號一起輸入，換行無效，雙引號「"」無效</span></h2>
+           <textarea id="text4speech" rows="5" cols="50"></textarea>
+     
+           <h2>6. 檔案名稱 <i class="fas fa-download"></i><span>命名格式:第一週_01_內容</span></h2>
+           <input class="fileName" id="fileName" type="text"  required>
+     
+           <button id="downloadButton">Download</button>
+       </form>
+     </div>
+
+</body>
+
+<script>
+  //語言的陣列
+  const languages=[{name:'國語(台灣)',code:'zh-Tw'},{name:'英語(美國)',code:'en-US'},{name:'日語(標準語)',code:'ja-JP'},{name:'韓語(韓國)',code:'ko-KR'}];
+    //document就是這html文件。
+    //getElementById是裡面的方法，參數給"language-list"抓到這id標籤列
+    var languageSelect=document.getElementById("language-list");
+    //製造一個字串，以html的語法填入院的陣列
+    var inner="";
+    var languageCode="";
+    for(var i=0;i<languages.length;i++){
+        
+        //inner第一行就會像是 <option value=0>zh-TW</option>
+        inner=inner+'<option value='+languages[i].code+'>'+languages[i].name+'</option>';
+    }
+    //innerHTML 賦值inner給這element屬性
+    languageSelect.innerHTML=inner;
+    /*
+    其實就是用程式碼的方式把XML文件修改成這樣
+    <select id="language-list">
+        <option value="zh-Tw">國語(台灣)</option>
+        <option value="en-US">英語(美國)</option>
+        ....		
+    </select>
+    */
+    //這裡放系所的陣列(有順序性，對應各學院的資料)
+    const roles=new Array();
+    roles[0]=[{name:'曉臻(女)',code:'zh-TW-HsiaoChenNeural'},{name:'曉雨(女)',code:'zh-TW-HsiaoYuNeural'},{name:'雲哲(男)',code:'zh-TW-YunJheNeural'}];
+    roles[1]=[{name:'Aria(女)',code:'en-US-AriaNeural'},{name:'Jenny(女)',code:'en-US-JennyNeural'},{name:'Guy(男)',code:'en-US-GuyNeural'},{name:'Brandon(男)',code:'en-US-BrandonNeural'}];
+    roles[2]=[{name:'奈奈美(女)',code:'ja-JP-NanamiNeural'},{name:'啟太(男)',code:'ja-JP-KeitaNeural'}];
+    roles[3]=[{name:'선희(女)',code:'ko-KR-SunHiNeural'},{name:'인준(男)',code:'ko-KR-InJoonNeural'}];
+
+    //動到"language-list"這select元素後呼叫此方法
+    function changeLanguage(index){
+        //跟剛剛一樣，製造一個字串，以html的語法填入系所的陣列
+        var Sinner="";
+        for(var i=0;i<roles[index].length;i++){
+            Sinner=Sinner+'<option value='+roles[index][i].code+'>'+roles[index][i].name+'</option>';
+        }
+        //抓到"role-list"這select元素，修改其值
+        var roleSelect=document.getElementById("role-list");
+        roleSelect.innerHTML=Sinner;
+    }
+    //這裡呼叫一次"changeLanguage"這方法，讓瀏覽器在讀完XML後可以直接讓角色的資料出來
+    changeLanguage(document.getElementById("language-list").selectedIndex);
+
+
+//------------------------------------------------------------------------------------------
+
+var theKey=document.getElementById("keyBox").text;
+var theLanguage=document.getElementById("language-list").value;
+var theRole=document.getElementById("role-list").value;
+var theTextType=document.getElementById("textYype").value;
+var theText=document.getElementById("text4speech").value;
+
+var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="southcentralus")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname = datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
+
+//----------------------------------------------------------------------------------------------
+// 只支援IE
+// var fso = new ActiveXObject(Scripting.FileSystemObject);
+// var f   = fso.createtextfile("D:\Downloads"+fileName+".txt",2,true); 
+
+// f.writeLine(toPython);  //寫入內容
+// f.close(); //關閉對象
+//----------------------------------------------------------------------------------------------
+
+window.addEventListener('load', () => {
+  const downloadButton = document.getElementById('downloadButton');
+  downloadButton.addEventListener('click', downloadButton_clicked);
+});
+
+function downloadButton_clicked(evt) {
+  evt.preventDefault();
+  
+ //------------------------------------------------------------------------------------------
+
+    var theKey=document.getElementById("keyBox").value;
+    var theLanguage=document.getElementById("language-list").value;
+    var theRole=document.getElementById("role-list").value;
+    var theTextType=document.getElementById("textYype").value;
+    var theText=document.getElementById("text4speech").value;
+    var fileName=document.getElementById("fileName").value;
+    var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="southcentralus")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname = datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
+
+//----------------------------------------------------------------------------------------------
+  
+  const blob = new Blob([toPython], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  document.body.appendChild(a);
+  a.download = fileName+'.txt';
+  a.href = url;
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+  
+</script>
+
+</html>
