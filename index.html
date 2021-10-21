@@ -252,7 +252,7 @@ function downloadButton_clicked(evt) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   document.body.appendChild(a);
-  a.download = fileName+'.txt';
+  a.download = '基礎華語_'+fileName+'.txt';
   a.href = url;
   a.click();
   a.remove();
