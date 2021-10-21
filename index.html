@@ -153,7 +153,7 @@ i {
        <h2>5. 輸入文本 <i class="fas fa-file-alt"></i><span>含標點符號，刪除空白與換行，換行處與「"」前需加上「\」</span></h2>
        <textarea id="text4speech" rows="5" cols="50" required></textarea>
  
-       <h2>6. 檔案名稱 <i class="fas fa-download"></i><span>命名格式:第一週_01_內容</span></h2>
+       <h2>6. 檔案名稱 <i class="fas fa-download"></i><span>命名格式：第一週_01_內容</span></h2>
        <input class="fileName" id="fileName" type="text"  required>
  
        <button id="downloadButton">Download</button>
@@ -165,6 +165,7 @@ i {
 <script>
   //語言的陣列
   const languages=[{name:'國語(台灣)',code:'zh-Tw'},{name:'英語(美國)',code:'en-US'},{name:'日語(標準語)',code:'ja-JP'},{name:'韓語(韓國)',code:'ko-KR'}];
+
     //document就是這html文件。
     //getElementById是裡面的方法，參數給"language-list"抓到這id標籤列
     var languageSelect=document.getElementById("language-list");
@@ -172,7 +173,7 @@ i {
     var inner="";
     for(var i=0;i<languages.length;i++){
         
-        //inner第一行就會像是 <option value=0>zh-TW</option>
+        //inner第一行就會像是 <option value=zh-TW>國語(台灣)</option>
         inner=inner+'<option value='+languages[i].code+'>'+languages[i].name+'</option>';
     }
     //innerHTML 賦值inner給這element屬性
@@ -185,7 +186,8 @@ i {
         ....		
     </select>
     */
-    //這裡放系所的陣列(有順序性，對應各學院的資料)
+
+    //這裡放角色的陣列(有順序性，對應各語系的資料)
     const roles=new Array();
     roles[0]=[{name:'曉臻(女)',code:'zh-TW-HsiaoChenNeural'},{name:'曉雨(女)',code:'zh-TW-HsiaoYuNeural'},{name:'雲哲(男)',code:'zh-TW-YunJheNeural'}];
     roles[1]=[{name:'Aria(女)',code:'en-US-AriaNeural'},{name:'Jenny(女)',code:'en-US-JennyNeural'},{name:'Guy(男)',code:'en-US-GuyNeural'},{name:'Brandon(男)',code:'en-US-BrandonNeural'}];
@@ -207,24 +209,7 @@ i {
     changeLanguage(document.getElementById("language-list").selectedIndex);
 
 
-//------------------------------------------------------------------------------------------
-
-var theKey = document.getElementById("keyBox").value;
-var theRegion = document.getElementById("region").value;
-var theLanguage = document.getElementById("language-list").value;
-var theRole = document.getElementById("role-list").value;
-var theTextType = document.getElementById("textYype").value;
-var theText = document.getElementById("text4speech").value;
-
-var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="'+theRegion+'")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname ="基礎華語_'+fileName+'"+datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
-
-//----------------------------------------------------------------------------------------------
-// 只支援IE
-// var fso = new ActiveXObject(Scripting.FileSystemObject);
-// var f   = fso.createtextfile("D:\Downloads"+fileName+".txt",2,true); 
-
-// f.writeLine(toPython);  //寫入內容
-// f.close(); //關閉對象
+// download txt file
 //----------------------------------------------------------------------------------------------
 
 window.addEventListener('load', () => {
@@ -235,17 +220,18 @@ window.addEventListener('load', () => {
 function downloadButton_clicked(evt) {
   evt.preventDefault();
   
- //------------------------------------------------------------------------------------------
+    // generate python script 
+    //------------------------------------------------------------------------------------------
 
-    var theKey=document.getElementById("keyBox").value;
-    var theLanguage=document.getElementById("language-list").value;
-    var theRole=document.getElementById("role-list").value;
-    var theTextType=document.getElementById("textYype").value;
-    var theText=document.getElementById("text4speech").value;
-    var fileName=document.getElementById("fileName").value;
-    var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="southcentralus")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname ="基礎華語_'+fileName+'"+'+ 'datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
+        var theKey=document.getElementById("keyBox").value;
+        var theLanguage=document.getElementById("language-list").value;
+        var theRole=document.getElementById("role-list").value;
+        var theTextType=document.getElementById("textYype").value;
+        var theText=document.getElementById("text4speech").value;
+        var fileName=document.getElementById("fileName").value;
+        var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="southcentralus")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname ="基礎華語_'+ fileName +'"+datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
 
-//----------------------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
   
   const blob = new Blob([toPython], {type: 'text/plain'});
   const url = URL.createObjectURL(blob);
