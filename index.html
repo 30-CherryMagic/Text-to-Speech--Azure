@@ -217,7 +217,7 @@ var theRole = document.getElementById("role-list").value;
 var theTextType = document.getElementById("textYype").value;
 var theText = document.getElementById("text4speech").value;
 
-var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="'+theRegion+'")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname = datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
+var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="'+theRegion+'")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname ="基礎華語_'+fileName+'"+datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
 
 //----------------------------------------------------------------------------------------------
 // 只支援IE
