@@ -238,7 +238,7 @@ function downloadButton_clicked(evt) {
 //python檔 MIME寫法
 //https://stackoverflow.com/questions/45614485/what-is-the-mime-type-for-py-files 
   
-  const blob = new Blob([toPython], {type: 'application/x-python-code'});
+  const blob = new Blob([toPython], {type: 'text/x-python'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   document.body.appendChild(a);
