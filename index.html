@@ -168,7 +168,7 @@ i {
        <h2>5. 輸入文本 <i class="fas fa-file-alt"></i><span>含標點符號，刪除空白與換行，換行處與「"」前需加上「\」</span></h2>
        <textarea id="text4speech" rows="4" cols="50" required></textarea>
  
-       <h2>6. 檔案名稱 <i class="fas fa-keyboard"></i><span>產生出的.mp3檔名會與此處檔名相同</span></h2>
+       <h2>6. 檔案名稱 <i class="fas fa-keyboard"></i><span>※此為必填項目</span></h2>
        <input class="fileName" id="fileName" type="text"  required>
       <div class="button-area">
         <button id="downloadButtonMp3"><i class="fas fa-download"></i>&nbsp;MP3 Audio</button>
@@ -287,12 +287,16 @@ function downloadButtonMp3_clicked(evt) {
   var theRole = document.getElementById("role-list").value;
   var theTextType = document.getElementById("textType").value;
   var theText = document.getElementById("text4speech").value;
+  var fileName=document.getElementById("fileName").value;
 
   const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(theKey, theRegion);
-  // Set the output format
-  speechConfig.speechSynthesisOutputFormat = SpeechSDK.SpeechSynthesisOutputFormat.Audio16Khz128KBitRateMonoMp3;
   speechConfig.speechSynthesisLanguage= String(theLanguage);
   speechConfig.speechSynthesisVoiceName = String(theRole);
+    
+    
+    // Set the output format -- https://docs.microsoft.com/zh-tw/azure/cognitive-services/speech-service/get-started-text-to-speech?tabs=script%2Cwindowsinstall&pivots=programming-language-javascript#customize-audio-format
+  speechConfig.speechSynthesisOutputFormat = SpeechSDK.SpeechSynthesisOutputFormat.Audio16Khz128KBitRateMonoMp3;
+  
 
   const synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig, undefined);
   if(String(theTextType) != "synthesizer.speak_ssml_async(scenario)")
@@ -304,7 +308,10 @@ function downloadButtonMp3_clicked(evt) {
             const audioData = result.audioData;
             console.log(`Audio data byte size: ${audioData.byteLength}.`)
             synthesizer.close();
+            
+            //JSON.stringify() ：物件變 JSON
             console.log(JSON.stringify(result));
+            
             //return result.audioData;
             const blob = new Blob([result.audioData], {'type': 'audio/mp3'});
             const url = URL.createObjectURL(blob);
@@ -328,6 +335,7 @@ function downloadButtonMp3_clicked(evt) {
         });
   }
   else
+  //使用SSML自訂語音特性 -- https://docs.microsoft.com/zh-tw/azure/cognitive-services/speech-service/get-started-text-to-speech?tabs=script%2Cwindowsinstall&pivots=programming-language-javascript#use-ssml-to-customize-speech-characteristics
   {
     console.log("[INFO] In SSML Mode");
     synthesizer.speakSsmlAsync(
