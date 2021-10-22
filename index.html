@@ -102,9 +102,13 @@ input {
   padding: 7px;
 }
 
+.fileName {
+  width: 450px;
+}
+
 button {
-  display: inline;
-  margin-left: 20px;
+  display: inline-block;
+  margin: 20px 15px 15px 0px;
   padding: 7px 20px 7px 20px;
   margin-bottom: 50px;
   font-weight: bold;
@@ -112,6 +116,7 @@ button {
   color: #FFF;
   border-radius: 7px;
   border: none;
+  font-size: 13px;
 }
 
 i {
@@ -120,6 +125,15 @@ i {
 
 .fa-python {
   color: #FFF;
+}
+.fa-download {
+  color: #FFF;
+}
+
+.button-area{
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 50px;
 }
 </style>
 
@@ -153,11 +167,12 @@ i {
        <h2>5. 輸入文本 <i class="fas fa-file-alt"></i><span>含標點符號，刪除空白與換行，換行處與「"」前需加上「\」</span></h2>
        <textarea id="text4speech" rows="5" cols="50" required></textarea>
  
-       <h2>6. 檔案名稱 <i class="fas fa-download"></i><span>產生出的.mp3檔名會與此處檔名相同</span></h2>
+       <h2>6. 檔案名稱 <i class="fas fa-keyboard"></i><span>產生出的.mp3檔名會與此處檔名相同</span></h2>
        <input class="fileName" id="fileName" type="text"  required>
- 
-       <button id="downloadButton">Download Python Code</button>
-       <button id="downloadButtonMp3">Download MP3 Audio</button>
+      <div class="button-area">
+        <button id="downloadButtonMp3"><i class="fas fa-download"></i>&nbsp;MP3 Audio</button>
+        <button id="downloadButton"><i class="fas fa-download"></i>&nbsp;Python Code</button>
+      </div>
    </form>
  </div>
 
@@ -215,7 +230,7 @@ i {
     changeLanguage(document.getElementById("language-list").selectedIndex);
 
 
-// download txt file
+// download python code
 //----------------------------------------------------------------------------------------------
 
 window.addEventListener('load', () => {
