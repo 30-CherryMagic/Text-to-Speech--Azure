@@ -145,7 +145,7 @@ i {
        <select id="role-list"></select><!--給定這id，等等需要用他填入對應的角色資料-->
  
        <h2>4. 選擇文本類型 <i class="fas fa-code"></i><span>有調整語速請選SSML</span></h2>
-       <select id="textYype">
+       <select id="textType">
          <option value="synthesizer.speak_text_async(scenario)">純文字</option>
          <option value="synthesizer.speak_ssml_async(scenario)">SSML</option>
        </select>
@@ -156,13 +156,19 @@ i {
        <h2>6. 檔案名稱 <i class="fas fa-download"></i><span>產生出的.mp3檔名會與此處檔名相同</span></h2>
        <input class="fileName" id="fileName" type="text"  required>
  
-       <button id="downloadButton">Download</button>
+       <button id="downloadButton">Download Python Code</button>
+       <button id="downloadButtonMp3">Download MP3 Audio</button>
    </form>
  </div>
 
 </body>
 
+<script src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle.js"></script>
 <script>
+  var SpeechSDK;
+  if (!!window.SpeechSDK) {
+    SpeechSDK = window.SpeechSDK;
+  }
   //語言的陣列
   const languages=[{name:'國語(台灣)',code:'zh-Tw'},{name:'英語(美國)',code:'en-US'},{name:'日語(標準語)',code:'ja-JP'},{name:'韓語(韓國)',code:'ko-KR'}];
 
@@ -215,6 +221,8 @@ i {
 window.addEventListener('load', () => {
   const downloadButton = document.getElementById('downloadButton');
   downloadButton.addEventListener('click', downloadButton_clicked);
+  const downloadButtonMp3 = document.getElementById('downloadButtonMp3')
+  downloadButtonMp3.addEventListener('click', downloadButtonMp3_clicked)
 });
 
 function downloadButton_clicked(evt) {
@@ -226,7 +234,7 @@ function downloadButton_clicked(evt) {
         var theKey=document.getElementById("keyBox").value;
         var theLanguage=document.getElementById("language-list").value;
         var theRole=document.getElementById("role-list").value;
-        var theTextType=document.getElementById("textYype").value;
+        var theTextType=document.getElementById("textType").value;
         var theText=document.getElementById("text4speech").value;
         var fileName=document.getElementById("fileName").value;
         var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="southcentralus")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname ="'+ fileName +'"+datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
@@ -249,6 +257,91 @@ function downloadButton_clicked(evt) {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+function downloadButtonMp3_clicked(evt) {
+  evt.preventDefault();
+  
+  var theKey = document.getElementById("keyBox").value;
+  var theRegion = document.getElementById("region").value;
+  var theLanguage = document.getElementById("language-list").value;
+  var theRole = document.getElementById("role-list").value;
+  var theTextType = document.getElementById("textType").value;
+  var theText = document.getElementById("text4speech").value;
+
+  const speechConfig = SpeechSDK.SpeechConfig.fromSubscription(theKey, theRegion);
+  // Set the output format
+  speechConfig.speechSynthesisOutputFormat = SpeechSDK.SpeechSynthesisOutputFormat.Audio16Khz128KBitRateMonoMp3;
+  speechConfig.speechSynthesisLanguage= String(theLanguage);
+  speechConfig.speechSynthesisVoiceName = String(theRole);
+
+  const synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig, undefined);
+  if(String(theTextType) != "synthesizer.speak_ssml_async(scenario)")
+  {
+    console.log("[INFO] In Text Mode");
+    synthesizer.speakTextAsync(
+        theText,
+        result => {
+            const audioData = result.audioData;
+            console.log(`Audio data byte size: ${audioData.byteLength}.`)
+            synthesizer.close();
+            console.log(JSON.stringify(result));
+            //return result.audioData;
+            const blob = new Blob([result.audioData], {'type': 'audio/mp3'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            var fileName = document.getElementById("fileName").value;
+            document.body.appendChild(a);
+            if (fileName==="")
+            {
+              fileName = "Result_From_Cognitive_Services";
+            }
+            a.download = fileName+'.mp3';
+            a.href = url;
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        },
+        error => {
+          console.log("FAILED")
+            console.log(error);
+            synthesizer.close();
+        });
+  }
+  else
+  {
+    console.log("[INFO] In SSML Mode");
+    synthesizer.speakSsmlAsync(
+      String(theText),
+        result => {
+            if (result.errorDetails) {
+                console.error(result.errorDetails);
+            } else {
+                console.log(JSON.stringify(result));
+
+                  //return result.audioData;
+                  const blob = new Blob([result.audioData], {'type': 'audio/mp3'});
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  var fileName = document.getElementById("fileName").value;
+                  document.body.appendChild(a);
+                  if (fileName==="")
+                  {
+                    fileName = "Result_From_Cognitive_Services";
+                  }
+                  a.download = fileName+'.mp3';
+                  a.href = url;
+                  a.click();
+                  a.remove();
+                  URL.revokeObjectURL(url);
+            }
+            synthesizer.close();
+        },
+        error => {
+            console.log(error);
+            synthesizer.close();
+        });
+  }
 }
   
 </script>
