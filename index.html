@@ -233,11 +233,11 @@ function downloadButton_clicked(evt) {
 
     //----------------------------------------------------------------------------------------------
   
-  const blob = new Blob([toPython], {type: 'text/plain'});
+  const blob = new Blob([toPython], {type: 'application/x-python-code'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   document.body.appendChild(a);
-  a.download = '基礎華語_'+fileName+'.txt';
+  a.download = '基礎華語_'+fileName+'.py';
   a.href = url;
   a.click();
   a.remove();
