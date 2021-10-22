@@ -153,7 +153,7 @@ i {
        <h2>5. 輸入文本 <i class="fas fa-file-alt"></i><span>含標點符號，刪除空白與換行，換行處與「"」前需加上「\」</span></h2>
        <textarea id="text4speech" rows="5" cols="50" required></textarea>
  
-       <h2>6. 檔案名稱 <i class="fas fa-download"></i><span>命名格式：第一週_01_內容</span></h2>
+       <h2>6. 檔案名稱 <i class="fas fa-download"></i><span>產生出的.mp3檔名會與此處檔名相同</span></h2>
        <input class="fileName" id="fileName" type="text"  required>
  
        <button id="downloadButton">Download</button>
@@ -229,15 +229,22 @@ function downloadButton_clicked(evt) {
         var theTextType=document.getElementById("textYype").value;
         var theText=document.getElementById("text4speech").value;
         var fileName=document.getElementById("fileName").value;
-        var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="southcentralus")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname ="基礎華語_'+ fileName +'"+datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
+        var toPython='from azure.cognitiveservices.speech import AudioDataStream, SpeechConfig, SpeechSynthesizer, SpeechSynthesisOutputFormat\nfrom azure.cognitiveservices.speech.audio import AudioOutputConfig\nimport datetime\nspeech_config = SpeechConfig(subscription="'+ theKey +'", region="southcentralus")\nspeech_config.speech_synthesis_language = "'+ theLanguage +'"\nspeech_config.speech_synthesis_voice_name ="'+ theRole +'"\nfname ="'+ fileName +'"+datetime.datetime.today().strftime("%Y%m%d%H%M%S") + ".mp3"\naudio_config = AudioOutputConfig(filename=fname)\nscenario = "'+theText+'";\nsynthesizer = SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)\n'+theTextType;
 
     //----------------------------------------------------------------------------------------------
+  
+//MIME種類
+//https://developer.mozilla.org/zh-TW/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+//python檔 MIME寫法
+//https://stackoverflow.com/questions/45614485/what-is-the-mime-type-for-py-files 
   
   const blob = new Blob([toPython], {type: 'application/x-python-code'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   document.body.appendChild(a);
-  a.download = '基礎華語_'+fileName+'.py';
+  
+//副檔名也要改成.py才可以順利以python檔下載
+  a.download = fileName+'.py';
   a.href = url;
   a.click();
   a.remove();
