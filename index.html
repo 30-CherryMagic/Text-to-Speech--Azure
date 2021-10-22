@@ -308,10 +308,10 @@ function downloadButtonMp3_clicked(evt) {
             const a = document.createElement("a");
             var fileName = document.getElementById("fileName").value;
             document.body.appendChild(a);
-            if (fileName==="")
-            {
-              fileName = "Result_From_Cognitive_Services";
-            }
+            //if (fileName==="")
+            //{
+            //  fileName = "Result_From_Cognitive_Services";
+            //}
             a.download = fileName+'.mp3';
             a.href = url;
             a.click();
@@ -341,10 +341,10 @@ function downloadButtonMp3_clicked(evt) {
                   const a = document.createElement("a");
                   var fileName = document.getElementById("fileName").value;
                   document.body.appendChild(a);
-                  if (fileName==="")
-                  {
-                    fileName = "Result_From_Cognitive_Services";
-                  }
+                  //if (fileName==="")
+                  //{
+                  //  fileName = "Result_From_Cognitive_Services";
+                  //}
                   a.download = fileName+'.mp3';
                   a.href = url;
                   a.click();
