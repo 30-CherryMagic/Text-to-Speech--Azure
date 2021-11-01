@@ -297,7 +297,7 @@ function downloadButtonMp3_clicked(evt) {
     
     
     // Set the output format -- https://docs.microsoft.com/zh-tw/azure/cognitive-services/speech-service/get-started-text-to-speech?tabs=script%2Cwindowsinstall&pivots=programming-language-javascript#customize-audio-format
-  speechConfig.speechSynthesisOutputFormat = SpeechSDK.SpeechSynthesisOutputFormat.Audio16Khz128KBitRateMonoMp3;
+  speechConfig.speechSynthesisOutputFormat = SpeechSDK.SpeechSynthesisOutputFormat.Audio48Khz192KBitRateMonoMp3;
   
 
   const synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig, undefined);
